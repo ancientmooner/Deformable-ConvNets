@@ -37,6 +37,7 @@ config.network.FIXED_PARAMS_SHARED = ['gamma', 'beta']
 config.network.ANCHOR_SCALES = (8, 16, 32)
 config.network.ANCHOR_RATIOS = (0.5, 1, 2)
 config.network.NUM_ANCHORS = len(config.network.ANCHOR_SCALES) * len(config.network.ANCHOR_RATIOS)
+config.network.RGB_MODEL = 1   # 1: the classification model uses rgb source, 0: the classification model uses bgr source
 
 # dataset related params
 config.dataset = edict()
