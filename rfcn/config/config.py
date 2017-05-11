@@ -38,6 +38,11 @@ config.network.ANCHOR_SCALES = (8, 16, 32)
 config.network.ANCHOR_RATIOS = (0.5, 1, 2)
 config.network.NUM_ANCHORS = len(config.network.ANCHOR_SCALES) * len(config.network.ANCHOR_RATIOS)
 config.network.RGB_MODEL = 1   # 1: the classification model uses rgb source, 0: the classification model uses bgr source
+#used to define loss scale
+config.network.RPN_LOSS_SCALE = 1
+config.network.RCNN_LOSS_SCALE = 1
+#the # of bins used in psroipooling
+config.network.NBINS = 7
 
 # dataset related params
 config.dataset = edict()
@@ -163,6 +168,8 @@ config.TEST.max_per_image = 300
 
 # Test Model Epoch
 config.TEST.test_epoch = 0
+
+config.TEST.EVAL_EVERY_EPOCH = False
 
 
 def update_config(config_file):

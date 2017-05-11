@@ -741,8 +741,9 @@ class MutableModule(BaseModule):
         if fixed_param_prefix is not None:
             for name in self._symbol.list_arguments():
                 for prefix in self._fixed_param_prefix:
-                    if name.startswith(prefix):
+                    if name.startswith(prefix) or name.endswith(prefix):
                         fixed_param_names.append(name)
+                        print "fixed params:", name
         self._fixed_param_names = fixed_param_names
         self._preload_opt_states = None
 
@@ -962,6 +963,11 @@ class MutableModule(BaseModule):
         for epoch in range(begin_epoch, num_epoch):
             tic = time.time()
             eval_metric.reset()
+            #for debug
+            #if epoch == 0:
+            #    if epoch_end_callback is not None:
+            #        for callback in _as_list(epoch_end_callback):
+            #            callback(epoch, self.symbol, arg_params, aux_params)
             for nbatch, data_batch in enumerate(train_data):
                 if monitor is not None:
                     monitor.tic()

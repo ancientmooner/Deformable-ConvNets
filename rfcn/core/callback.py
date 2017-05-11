@@ -9,7 +9,9 @@
 import time
 import logging
 import mxnet as mx
-
+from function.test_rcnn import test_rcnn
+from utils.create_logger import create_logger
+import os
 
 class Speedometer(object):
     def __init__(self, batch_size, frequent=50):
@@ -57,4 +59,13 @@ def do_checkpoint(prefix, means, stds):
         mx.model.save_checkpoint(prefix, iter_no + 1, sym, arg, aux)
         arg.pop('rfcn_bbox_weight_test')
         arg.pop('rfcn_bbox_bias_test')
+    return _callback
+
+def do_evaluation(config, context, logger, final_output_path):
+    def _callback(iter_no, sym, arg, aux):
+        print final_output_path
+        if final_output_path is not None:
+            test_rcnn(config, config.dataset.dataset, config.dataset.test_image_set, config.dataset.root_path, config.dataset.dataset_path,
+                context, os.path.join(final_output_path, '..', '_'.join([iset for iset in config.dataset.image_set.split('+')]), config.TRAIN.model_prefix), iter_no + 1,
+                False, True, False, config.TEST.HAS_RPN, config.dataset.proposal, 1e-3, logger=logger, output_path=final_output_path)
     return _callback

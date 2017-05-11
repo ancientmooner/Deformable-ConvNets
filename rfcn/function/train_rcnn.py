@@ -11,6 +11,7 @@ import logging
 import pprint
 import os
 import mxnet as mx
+import numpy as np
 
 from symbols import *
 from core import callback, metric
@@ -27,6 +28,9 @@ def train_rcnn(cfg, dataset, image_set, root_path, dataset_path,
                frequent, kvstore, flip, shuffle, resume,
                ctx, pretrained, epoch, prefix, begin_epoch, end_epoch,
                train_shared, lr, lr_step, proposal, logger=None, output_path=None):
+
+    mx.random.seed(3)
+    np.random.seed(3)
     # set up logger
     if not logger:
         logging.basicConfig()
@@ -104,6 +108,11 @@ def train_rcnn(cfg, dataset, image_set, root_path, dataset_path,
     batch_end_callback = callback.Speedometer(train_data.batch_size, frequent=frequent)
     epoch_end_callback = [mx.callback.module_checkpoint(mod, prefix, period=1, save_optimizer_states=True),
                           callback.do_checkpoint(prefix, means, stds)]
+
+    if cfg.TEST.EVAL_EVERY_EPOCH:
+        print "output_path", output_path
+        epoch_end_callback.append(callback.do_evaluation(cfg, ctx, logger, output_path))
+
     # decide learning rate
     base_lr = lr
     lr_factor = cfg.TRAIN.lr_factor

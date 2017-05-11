@@ -80,7 +80,7 @@ class aligned_xception_wider_nbins(Symbol):
         b3 = b3 + rs3
 
         # block 4
-        rs4 = mx.sym.Convolution(b3, num_filter=728, kernel=(1, 1), stride=(2, 2),
+        rs4 = mx.sym.Convolution(b3, num_filter=1024, kernel=(1, 1), stride=(2, 2),
                                  no_bias=True, name='convolution2d_3')
         rs4 = mx.sym.BatchNorm(rs4, name='batchnormalization_3', use_global_stats=self.use_global_stats, eps=self.eps)
 

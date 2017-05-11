@@ -52,13 +52,14 @@ def main():
     logger, output_path = create_logger(config.output_path, args.cfg, config.dataset.image_set)
     shutil.copy2(os.path.join(curr_path, 'symbols', config.symbol + '.py'), output_path)
 
-    prefix = os.path.join(output_path, 'rfcn')
+    prefix = os.path.join(output_path, config.TRAIN.model_prefix)
+    #prefix = os.path.join(output_path, 'rfcn')
     logging.info('########## TRAIN rfcn WITH IMAGENET INIT AND RPN DETECTION')
     train_rcnn(config, config.dataset.dataset, config.dataset.image_set, config.dataset.root_path, config.dataset.dataset_path,
                args.frequent, config.default.kvstore, config.TRAIN.FLIP, config.TRAIN.SHUFFLE, config.TRAIN.RESUME,
                ctx, config.network.pretrained, config.network.pretrained_epoch, prefix, config.TRAIN.begin_epoch,
                config.TRAIN.end_epoch, train_shared=False, lr=config.TRAIN.lr, lr_step=config.TRAIN.lr_step,
-               proposal=config.dataset.proposal, logger=logger)
+               proposal=config.dataset.proposal, logger=logger, output_path=output_path)
 
 if __name__ == '__main__':
     main()
