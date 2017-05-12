@@ -43,7 +43,7 @@ config.network.RPN_LOSS_SCALE = 1
 config.network.RCNN_LOSS_SCALE = 1
 #the # of bins used in psroipooling
 config.network.NBINS = 7
-
+config.network.CONVNEW_CHANNEL = 1024
 # dataset related params
 config.dataset = edict()
 config.dataset.dataset = 'PascalVOC'

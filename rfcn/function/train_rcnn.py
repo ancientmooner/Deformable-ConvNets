@@ -23,11 +23,12 @@ from utils.load_model import load_param
 from utils.PrefetchingIter import PrefetchingIter
 from utils.lr_scheduler import WarmupMultiFactorScheduler
 
+from dataset import *
 
 def train_rcnn(cfg, dataset, image_set, root_path, dataset_path,
                frequent, kvstore, flip, shuffle, resume,
                ctx, pretrained, epoch, prefix, begin_epoch, end_epoch,
-               train_shared, lr, lr_step, proposal, logger=None, output_path=None):
+               train_shared, lr, lr_step, proposal, logger=None, output_path=None, test_image_set=None):
 
     mx.random.seed(3)
     np.random.seed(3)
@@ -61,6 +62,26 @@ def train_rcnn(cfg, dataset, image_set, root_path, dataset_path,
     # load training data
     train_data = ROIIter(roidb, cfg, batch_size=input_batch_size, shuffle=shuffle,
                          ctx=ctx, aspect_grouping=cfg.TRAIN.ASPECT_GROUPING)
+
+    # load test data
+    if cfg.TEST.EVAL_EVERY_EPOCH and test_image_set is not None:
+        test_image_sets = [iset for iset in test_image_set.split('+')]
+        roidbs_test = [load_proposal_roidb(dataset, image_set, root_path, dataset_path,
+                                  proposal=proposal, append_gt=True, flip=flip, result_path=output_path)
+                    for image_set in test_image_sets]
+        roidb_test = merge_roidb(roidbs_test)
+        roidb_test = filter_roidb(roidb_test, cfg)
+        #imdb = eval(dataset)(test_image_set, root_path, dataset_path, result_path=output_path)
+        #gt_roidb = imdb.gt_roidb()
+        #roidb_test = eval('imdb.' + proposal + '_roidb')(gt_roidb)
+        means_test, stds_test = add_bbox_regression_targets(roidb_test, cfg)
+        test_data = ROIIter(roidb_test, cfg, batch_size=len(ctx), shuffle=False,
+                         ctx=ctx, aspect_grouping=False)
+        if not isinstance(test_data, PrefetchingIter):
+            test_data = PrefetchingIter(test_data)
+        #test_data = TestLoader(roidb_test, cfg, batch_size=len(ctx), shuffle=False, has_rpn=False)
+    else:
+        test_data = None
 
     # infer max shape
     max_data_shape = [('data', (cfg.TRAIN.BATCH_IMAGES, 3, max([v[0] for v in cfg.SCALES]), max([v[1] for v in cfg.SCALES])))]
@@ -135,7 +156,7 @@ def train_rcnn(cfg, dataset, image_set, root_path, dataset_path,
     if not isinstance(train_data, PrefetchingIter):
         train_data = PrefetchingIter(train_data)
 
-    mod.fit(train_data, eval_metric=eval_metrics, epoch_end_callback=epoch_end_callback,
+    mod.fit(train_data, eval_data=test_data, eval_metric=eval_metrics, epoch_end_callback=epoch_end_callback,
             batch_end_callback=batch_end_callback, kvstore=kvstore,
             optimizer='sgd', optimizer_params=optimizer_params,
             arg_params=arg_params, aux_params=aux_params, begin_epoch=begin_epoch, num_epoch=end_epoch)

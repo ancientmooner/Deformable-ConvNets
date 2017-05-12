@@ -968,6 +968,8 @@ class MutableModule(BaseModule):
             #    if epoch_end_callback is not None:
             #        for callback in _as_list(epoch_end_callback):
             #            callback(epoch, self.symbol, arg_params, aux_params)
+            #----------------------------------------
+            # evaluation on validation set
             for nbatch, data_batch in enumerate(train_data):
                 if monitor is not None:
                     monitor.tic()
