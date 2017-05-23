@@ -1,4 +1,6 @@
 import resnet_v1_101_rfcn
 import resnet_v1_101_rfcn_dcn
 import aligned_xception_wider_nbins
+import aligned_xception_keras_nbins
 import resnet_v1_101_rfcn_cg
+import resnet_v1_101_rfcn_dcn_cg

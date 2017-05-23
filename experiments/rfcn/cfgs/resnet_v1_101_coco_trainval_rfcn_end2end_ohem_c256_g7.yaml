@@ -1,7 +1,7 @@
 ---
 MXNET_VERSION: "mxnet_f2b1ee4"
 output_path: "./output/rfcn/coco"
-symbol: resnet_v1_101_rfcn
+symbol: resnet_v1_101_rfcn_cg
 gpus: '0,1,2,3'
 CLASS_AGNOSTIC: true
 SCALES:
@@ -48,6 +48,8 @@ network:
   - 16
   - 32
   NUM_ANCHORS: 12
+  NBINS: 7
+  CONVNEW_CHANNEL: 256
 dataset:
   NUM_CLASSES: 81
   dataset: coco

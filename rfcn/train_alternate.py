@@ -57,65 +57,67 @@ def alternate_train(args, ctx, pretrained, epoch):
 
     if not os.path.exists(rpn1_prefix):
         os.makedirs(rpn1_prefix)
-
-    config.TRAIN.BATCH_IMAGES = config.TRAIN.ALTERNATE.RPN_BATCH_IMAGES
-    train_rpn(config, config.dataset.dataset, config.dataset.image_set, config.dataset.root_path, config.dataset.dataset_path,
+    if config.TRAIN.ALTERNATE.rpn1_epoch is not 0:
+        config.TRAIN.BATCH_IMAGES = config.TRAIN.ALTERNATE.RPN_BATCH_IMAGES
+        train_rpn(config, config.dataset.dataset, config.dataset.image_set, config.dataset.root_path, config.dataset.dataset_path,
               args.frequent, config.default.kvstore, config.TRAIN.FLIP, config.TRAIN.SHUFFLE, config.TRAIN.RESUME,
               ctx, pretrained, epoch, rpn1_prefix, begin_epoch, config.TRAIN.ALTERNATE.rpn1_epoch, train_shared=False,
               lr=config.TRAIN.ALTERNATE.rpn1_lr, lr_step=config.TRAIN.ALTERNATE.rpn1_lr_step, logger=logger, output_path=output_path)
 
-    logging.info('########## GENERATE RPN DETECTION')
-    image_sets = [iset for iset in config.dataset.image_set.split('+')]
-    image_sets.extend([iset for iset in config.dataset.test_image_set.split('+')])
-    for image_set in image_sets:
-        test_rpn(config, config.dataset.dataset, image_set, config.dataset.root_path, config.dataset.dataset_path,
+        logging.info('########## GENERATE RPN DETECTION')
+        image_sets = [iset for iset in config.dataset.image_set.split('+')]
+        image_sets.extend([iset for iset in config.dataset.test_image_set.split('+')])
+        for image_set in image_sets:
+            test_rpn(config, config.dataset.dataset, image_set, config.dataset.root_path, config.dataset.dataset_path,
                  ctx, rpn1_prefix, config.TRAIN.ALTERNATE.rpn1_epoch, vis=False, shuffle=False, thresh=0, logger=logger,
                  output_path=rpn1_prefix)
 
-    logging.info('########## TRAIN rfcn WITH IMAGENET INIT AND RPN DETECTION')
-    rfcn1_prefix = os.path.join(output_path, 'rfcn1')
-    config.TRAIN.BATCH_IMAGES = config.TRAIN.ALTERNATE.RCNN_BATCH_IMAGES
-    train_rcnn(config, config.dataset.dataset, config.dataset.image_set, config.dataset.root_path, config.dataset.dataset_path,
-               args.frequent, config.default.kvstore, config.TRAIN.FLIP, config.TRAIN.SHUFFLE, config.TRAIN.RESUME,
-               ctx, pretrained, epoch, rfcn1_prefix, begin_epoch, config.TRAIN.ALTERNATE.rfcn1_epoch, train_shared=False,
-               lr=config.TRAIN.ALTERNATE.rfcn1_lr, lr_step=config.TRAIN.ALTERNATE.rfcn1_lr_step, proposal='rpn', logger=logger,
-               output_path=rpn1_prefix)
 
-    logging.info('########## TRAIN RPN WITH rfcn INIT')
-    rpn2_prefix = os.path.join(output_path, 'rpn2')
+    if config.TRAIN.ALTERNATE.rfcn1_epoch is not 0:
+        logging.info('########## TRAIN rfcn WITH IMAGENET INIT AND RPN DETECTION')
+        rfcn1_prefix = os.path.join(output_path, 'rfcn1')
+        config.TRAIN.BATCH_IMAGES = config.TRAIN.ALTERNATE.RCNN_BATCH_IMAGES
+        train_rcnn(config, config.dataset.dataset, config.dataset.image_set, config.dataset.root_path, config.dataset.dataset_path,
+                   args.frequent, config.default.kvstore, config.TRAIN.FLIP, config.TRAIN.SHUFFLE, config.TRAIN.RESUME,
+                   ctx, pretrained, epoch, rfcn1_prefix, begin_epoch, config.TRAIN.ALTERNATE.rfcn1_epoch, train_shared=False,
+                   lr=config.TRAIN.ALTERNATE.rfcn1_lr, lr_step=config.TRAIN.ALTERNATE.rfcn1_lr_step, proposal='rpn', logger=logger,
+                   output_path=rpn1_prefix)
 
-    if not os.path.exists(rpn2_prefix):
-        os.makedirs(rpn2_prefix)
+        logging.info('########## TRAIN RPN WITH rfcn INIT')
+        rpn2_prefix = os.path.join(output_path, 'rpn2')
 
-    config.TRAIN.BATCH_IMAGES = config.TRAIN.ALTERNATE.RPN_BATCH_IMAGES
-    train_rpn(config, config.dataset.dataset, config.dataset.image_set, config.dataset.root_path, config.dataset.dataset_path,
-              args.frequent, config.default.kvstore, config.TRAIN.FLIP, config.TRAIN.SHUFFLE, config.TRAIN.RESUME,
-              ctx, rfcn1_prefix, config.TRAIN.ALTERNATE.rpn2_epoch, rpn2_prefix, begin_epoch, config.TRAIN.ALTERNATE.rpn2_epoch,
-              train_shared=True, lr=config.TRAIN.ALTERNATE.rpn2_lr, lr_step=config.TRAIN.ALTERNATE.rpn2_lr_step, logger=logger,
-              output_path=output_path)
+        if not os.path.exists(rpn2_prefix):
+            os.makedirs(rpn2_prefix)
 
-    logging.info('########## GENERATE RPN DETECTION')
-    image_sets = [iset for iset in config.dataset.image_set.split('+')]
-    for image_set in image_sets:
-        test_rpn(config, config.dataset.dataset, image_set, config.dataset.root_path, config.dataset.dataset_path,
-                 ctx, rpn2_prefix, config.TRAIN.ALTERNATE.rpn2_epoch, vis=False, shuffle=False, thresh=0, logger=logger,
-                 output_path=rpn2_prefix)
+        config.TRAIN.BATCH_IMAGES = config.TRAIN.ALTERNATE.RPN_BATCH_IMAGES
+        train_rpn(config, config.dataset.dataset, config.dataset.image_set, config.dataset.root_path, config.dataset.dataset_path,
+                  args.frequent, config.default.kvstore, config.TRAIN.FLIP, config.TRAIN.SHUFFLE, config.TRAIN.RESUME,
+                  ctx, rfcn1_prefix, config.TRAIN.ALTERNATE.rpn2_epoch, rpn2_prefix, begin_epoch, config.TRAIN.ALTERNATE.rpn2_epoch,
+                  train_shared=True, lr=config.TRAIN.ALTERNATE.rpn2_lr, lr_step=config.TRAIN.ALTERNATE.rpn2_lr_step, logger=logger,
+                  output_path=output_path)
 
-    logger.info('########## COMBINE RPN2 WITH rfcn1')
-    rfcn2_prefix = os.path.join(output_path, 'rfcn2')
-    combine_model(rpn2_prefix, config.TRAIN.ALTERNATE.rpn2_epoch, rfcn1_prefix, config.TRAIN.ALTERNATE.rfcn1_epoch, rfcn2_prefix, 0)
+        logging.info('########## GENERATE RPN DETECTION')
+        image_sets = [iset for iset in config.dataset.image_set.split('+')]
+        for image_set in image_sets:
+            test_rpn(config, config.dataset.dataset, image_set, config.dataset.root_path, config.dataset.dataset_path,
+                     ctx, rpn2_prefix, config.TRAIN.ALTERNATE.rpn2_epoch, vis=False, shuffle=False, thresh=0, logger=logger,
+                     output_path=rpn2_prefix)
 
-    logger.info('########## TRAIN rfcn WITH RPN INIT AND DETECTION')
-    config.TRAIN.BATCH_IMAGES = config.TRAIN.ALTERNATE.RCNN_BATCH_IMAGES
-    train_rcnn(config, config.dataset.dataset, config.dataset.image_set, config.dataset.root_path, config.dataset.dataset_path,
-               args.frequent, config.default.kvstore, config.TRAIN.FLIP, config.TRAIN.SHUFFLE, config.TRAIN.RESUME,
-               ctx, rfcn2_prefix, 0, rfcn2_prefix, begin_epoch, config.TRAIN.ALTERNATE.rfcn2_epoch, train_shared=True,
-               lr=config.TRAIN.ALTERNATE.rfcn2_lr, lr_step=config.TRAIN.ALTERNATE.rfcn2_lr_step, proposal='rpn', logger=logger,
-               output_path=rpn2_prefix)
+        logger.info('########## COMBINE RPN2 WITH rfcn1')
+        rfcn2_prefix = os.path.join(output_path, 'rfcn2')
+        combine_model(rpn2_prefix, config.TRAIN.ALTERNATE.rpn2_epoch, rfcn1_prefix, config.TRAIN.ALTERNATE.rfcn1_epoch, rfcn2_prefix, 0)
 
-    logger.info('########## COMBINE RPN2 WITH rfcn2')
-    final_prefix = os.path.join(output_path, 'final')
-    combine_model(rpn2_prefix, config.TRAIN.ALTERNATE.rpn2_epoch, rfcn2_prefix, config.TRAIN.ALTERNATE.rfcn2_epoch, final_prefix, 0)
+        logger.info('########## TRAIN rfcn WITH RPN INIT AND DETECTION')
+        config.TRAIN.BATCH_IMAGES = config.TRAIN.ALTERNATE.RCNN_BATCH_IMAGES
+        train_rcnn(config, config.dataset.dataset, config.dataset.image_set, config.dataset.root_path, config.dataset.dataset_path,
+                   args.frequent, config.default.kvstore, config.TRAIN.FLIP, config.TRAIN.SHUFFLE, config.TRAIN.RESUME,
+                   ctx, rfcn2_prefix, 0, rfcn2_prefix, begin_epoch, config.TRAIN.ALTERNATE.rfcn2_epoch, train_shared=True,
+                   lr=config.TRAIN.ALTERNATE.rfcn2_lr, lr_step=config.TRAIN.ALTERNATE.rfcn2_lr_step, proposal='rpn', logger=logger,
+                   output_path=rpn2_prefix)
+
+        logger.info('########## COMBINE RPN2 WITH rfcn2')
+        final_prefix = os.path.join(output_path, 'final')
+        combine_model(rpn2_prefix, config.TRAIN.ALTERNATE.rpn2_epoch, rfcn2_prefix, config.TRAIN.ALTERNATE.rfcn2_epoch, final_prefix, 0)
 
 def main():
     print('Called with argument:', args)

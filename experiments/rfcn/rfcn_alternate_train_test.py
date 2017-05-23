@@ -18,7 +18,7 @@ import test
 
 if __name__ == "__main__":
     train_alternate.main()
-    test.main()
+    #test.main()
 
 
 

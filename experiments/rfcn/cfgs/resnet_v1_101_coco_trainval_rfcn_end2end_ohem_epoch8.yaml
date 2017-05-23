@@ -58,13 +58,13 @@ dataset:
   proposal: rpn
 TRAIN:
   lr: 0.0005
-  lr_step: '0.667'
+  lr_step: '5.333'
   warmup: true
   warmup_lr: 0.00005
   # typically we will use 8000 warmup step for single GPU for COCO
   warmup_step: 1000
   begin_epoch: 0
-  end_epoch: 1
+  end_epoch: 8
   model_prefix: 'rfcn_coco'
   # whether resume training
   RESUME: false
@@ -149,6 +149,6 @@ TEST:
   PROPOSAL_MIN_SIZE: 0
   # RCNN nms
   NMS: 0.3
-  test_epoch: 1
+  test_epoch: 8
   max_per_image: 100
 
