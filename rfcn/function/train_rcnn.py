@@ -131,8 +131,9 @@ def train_rcnn(cfg, dataset, image_set, root_path, dataset_path,
                           callback.do_checkpoint(prefix, means, stds)]
 
     if cfg.TEST.EVAL_EVERY_EPOCH:
+        print "prefix", prefix
         print "output_path", output_path
-        epoch_end_callback.append(callback.do_evaluation(cfg, ctx, logger, output_path))
+        epoch_end_callback.append(callback.do_evaluation(cfg, ctx, logger, output_path, prefix))
 
     # decide learning rate
     base_lr = lr

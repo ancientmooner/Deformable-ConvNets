@@ -30,6 +30,7 @@ def test_rcnn(cfg, dataset, image_set, root_path, dataset_path,
     pprint.pprint(cfg)
     logger.info('testing cfg:{}\n'.format(pprint.pformat(cfg)))
 
+    print 'output path', output_path
     # load symbol and testing data
     if has_rpn:
         sym_instance = eval(cfg.symbol + '.' + cfg.symbol)()

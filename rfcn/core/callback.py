@@ -61,11 +61,15 @@ def do_checkpoint(prefix, means, stds):
         arg.pop('rfcn_bbox_bias_test')
     return _callback
 
-def do_evaluation(config, context, logger, final_output_path):
+def do_evaluation(config, context, logger, final_output_path, model_prefix):
     def _callback(iter_no, sym, arg, aux):
         print final_output_path
         if final_output_path is not None:
+            #model_prefix = os.path.join(final_output_path, '..'), 
+            #if model_prefix is None:
+            #    model_prefix = os.path.join(model_prefix, '..', '_'.join([iset for iset in config.dataset.image_set.split('+')]), config.TRAIN.model_prefix)
+            
             test_rcnn(config, config.dataset.dataset, config.dataset.test_image_set, config.dataset.root_path, config.dataset.dataset_path,
-                context, os.path.join(final_output_path, '..', '_'.join([iset for iset in config.dataset.image_set.split('+')]), config.TRAIN.model_prefix), iter_no + 1,
+                context, model_prefix, iter_no + 1,
                 False, True, False, config.TEST.HAS_RPN, config.dataset.proposal, 1e-3, logger=logger, output_path=final_output_path)
     return _callback

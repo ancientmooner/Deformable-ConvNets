@@ -22,7 +22,7 @@ network:
   RPN_FEAT_STRIDE: 16
   FIXED_PARAMS:
   - block1_
-  - convolution2d
+  - convolution2d_1
   - block2_
   - batchnormalization
   - gamma

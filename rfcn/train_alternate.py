@@ -57,7 +57,7 @@ def alternate_train(args, ctx, pretrained, epoch):
 
     if not os.path.exists(rpn1_prefix):
         os.makedirs(rpn1_prefix)
-    if config.TRAIN.ALTERNATE.rpn1_epoch is not 0:
+    if config.TRAIN.ALTERNATE.rpn1_epoch is not 0 and config.TRAIN.ALTERNATE.rpn1_lr is not 0:
         config.TRAIN.BATCH_IMAGES = config.TRAIN.ALTERNATE.RPN_BATCH_IMAGES
         train_rpn(config, config.dataset.dataset, config.dataset.image_set, config.dataset.root_path, config.dataset.dataset_path,
               args.frequent, config.default.kvstore, config.TRAIN.FLIP, config.TRAIN.SHUFFLE, config.TRAIN.RESUME,
@@ -69,8 +69,8 @@ def alternate_train(args, ctx, pretrained, epoch):
         image_sets.extend([iset for iset in config.dataset.test_image_set.split('+')])
         for image_set in image_sets:
             test_rpn(config, config.dataset.dataset, image_set, config.dataset.root_path, config.dataset.dataset_path,
-                 ctx, rpn1_prefix, config.TRAIN.ALTERNATE.rpn1_epoch, vis=False, shuffle=False, thresh=0, logger=logger,
-                 output_path=rpn1_prefix)
+                ctx, rpn1_prefix, config.TRAIN.ALTERNATE.rpn1_epoch, vis=False, shuffle=False, thresh=0, logger=logger,
+                output_path=rpn1_prefix)
 
 
     if config.TRAIN.ALTERNATE.rfcn1_epoch is not 0:

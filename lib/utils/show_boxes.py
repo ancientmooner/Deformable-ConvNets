@@ -4,10 +4,12 @@
 # Licensed under The Apache-2.0 License [see LICENSE for details]
 # Written by Yi Li, Haocheng Zhang
 # --------------------------------------------------------
-
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from random import random as rand
 def show_boxes(im, dets, classes, scale = 1.0):
+
     plt.cla()
     plt.axis("off")
     plt.imshow(im)

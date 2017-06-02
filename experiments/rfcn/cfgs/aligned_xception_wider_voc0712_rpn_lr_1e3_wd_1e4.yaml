@@ -47,9 +47,9 @@ network:
 dataset:
   NUM_CLASSES: 21
   dataset: PascalVOC
-  dataset_path: "//jifengdnn01/hanhu/data/VOCdevkit"
+  dataset_path: "./data/VOCdevkit"
   image_set: 2007_trainval+2012_trainval
-  root_path: "//jifengdnn01/hanhu/data/"
+  root_path: "./data/"
   test_image_set: 2007_test
   proposal: rpn
 TRAIN:

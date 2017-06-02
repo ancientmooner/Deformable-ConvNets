@@ -2,7 +2,7 @@
 MXNET_VERSION: "mxnet_f2b1ee4"
 output_path: "./output/rfcn"
 symbol: aligned_xception_keras_nbins
-gpus: '0,1,2,3'
+gpus: '4,5,6,7'
 CLASS_AGNOSTIC: true
 SCALES:
 - 600
@@ -22,7 +22,7 @@ network:
   RPN_FEAT_STRIDE: 16
   FIXED_PARAMS:
   - block1_
-  - convolution2d
+  - convolution2d_1
   - block2_
   - batchnormalization
   - gamma
@@ -51,9 +51,9 @@ network:
 dataset:
   NUM_CLASSES: 21
   dataset: PascalVOC
-  dataset_path: "//jifengdnn01/hanhu/data/VOCdevkit"
+  dataset_path: "./data/VOCdevkit"
   image_set: 2007_trainval+2012_trainval
-  root_path: "//jifengdnn01/hanhu/data/"
+  root_path: "./data"
   test_image_set: 2007_test
   proposal: selective_search
 TRAIN:

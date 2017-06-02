@@ -2,7 +2,7 @@
 MXNET_VERSION: "mxnet_f2b1ee4"
 output_path: "./output/rfcn/coco"
 symbol: resnet_v1_101_rfcn
-gpus: '0,1,2,3'
+gpus: '0,1,2,3,4,5,6,7'
 CLASS_AGNOSTIC: true
 SCALES:
 - 600
@@ -51,9 +51,9 @@ network:
 dataset:
   NUM_CLASSES: 81
   dataset: coco
-  dataset_path: "//jifengdnn05/zhez/Data/coco"
+  dataset_path: "./data/coco"
   image_set: train2014+valminusminival2014
-  root_path: "//jifengdnn05/zhez/Data"
+  root_path: "./data"
   test_image_set: minival2014
   proposal: rpn
 TRAIN:
@@ -63,11 +63,11 @@ TRAIN:
   warmup_lr: 0.00005
   # typically we will use 8000 warmup step for single GPU for COCO
   warmup_step: 1000
-  begin_epoch: 0
+  begin_epoch: 7
   end_epoch: 8
   model_prefix: 'rfcn_coco'
   # whether resume training
-  RESUME: false
+  RESUME: true
   # whether flip image
   FLIP: true
   # whether shuffle image
